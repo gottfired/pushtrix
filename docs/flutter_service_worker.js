@@ -4,27 +4,29 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "b1707408aa8b1a3d10cf7cc028c5f53a",
-"index.html": "ef14c88420fca1eb3ef65665b75aa33b",
-"/": "ef14c88420fca1eb3ef65665b75aa33b",
-"main.dart.js": "ac92bd287eda3efc6f05a461f787db02",
+"index.html": "e18435aff24e12ff7ae21dedd88edb2e",
+"/": "e18435aff24e12ff7ae21dedd88edb2e",
+"main.dart.js": "67eead2a702e9f7905cc796fedaad979",
+"flutter.js": "f85e6fb278b0fd20c349186fb46ae36d",
 "img/loading.gif": "ad1b8dda0dcff92bd303cba6ed41072c",
 "img/loading_small.gif": "5ea7d8b9f126323cb04348eaa5f2f71f",
 "img/splash.png": "783169c8f70a1f6490a273bbe41a2b97",
-"favicon.png": "5dcef449791fa27946b3d35ad8803796",
-"icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
-"icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
-"icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
-"icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
-"manifest.json": "8eaf1de65865bfae7352815fee3438a4",
+"favicon.png": "7531477a6673d89f98b93e99d16f8d7b",
+"icons/Icon-192.png": "6c870e0b0b1d596c6062d4fe29216c4b",
+"icons/Icon-maskable-192.png": "6c870e0b0b1d596c6062d4fe29216c4b",
+"icons/Icon-maskable-512.png": "c9691d24dc081639ac6cdd9d065c4fff",
+"icons/Icon-512.png": "c9691d24dc081639ac6cdd9d065c4fff",
+"manifest.json": "4c907538532915039d241d8a817ee066",
 "assets/AssetManifest.json": "95b1bcb9b709bcad5aaaf47b38944707",
-"assets/NOTICES": "0a02337662c94ebd88ff4fd4503761d9",
+"assets/NOTICES": "717a8dcb22670a4f2de9898a46f1ba8d",
 "assets/FontManifest.json": "125dcd6a3329c5238c03be594be456bc",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
+"assets/shaders/ink_sparkle.frag": "7408b7fe25a1b9646cd62322d0640519",
 "assets/fonts/Rowdies-Bold.ttf": "b765a76d63821e1d811d7b2240e49ace",
 "assets/fonts/Rowdies-Light.ttf": "76feda2d732c062f958b226165ef347b",
 "assets/fonts/Rowdies-Regular.ttf": "b5b1173f24fc49f859ea6031810c9bbe",
 "assets/fonts/AzeretMono-Bold.ttf": "04c3af5db4df5aa2f27f53c161fa3735",
-"assets/fonts/MaterialIcons-Regular.otf": "4e6447691c9509f7acdbf8a931a85ca1",
+"assets/fonts/MaterialIcons-Regular.otf": "95db9098c58fd6db106f1116bae85a0b",
 "assets/assets/audio/music/bensound-punky.mp3": "880cde284f4238d9677fc0fb54e4c711",
 "assets/assets/audio/music/bensound-scifi.mp3": "4fe7478fd19f8919031313b198fbdc17",
 "assets/assets/audio/music/bensound-extremeaction.mp3": "25888ed1c7d78da14987dbf89e499e86",
@@ -40,19 +42,17 @@ const RESOURCES = {
 "assets/assets/audio/sounds/click.wav": "3f92aaba50f151a0e6e8cdbeaaafe102",
 "assets/assets/audio/sounds/too_easy.mp3": "d9a1547cb49350aab68cb965377e7332",
 "assets/assets/audio/sounds/awesome.mp3": "d4e2d7fc3de7d9b4759e370f4762993c",
-"canvaskit/canvaskit.js": "c2b4e5f3d7a3d82aed024e7249a78487",
-"canvaskit/profiling/canvaskit.js": "ae2949af4efc61d28a4a80fffa1db900",
-"canvaskit/profiling/canvaskit.wasm": "95e736ab31147d1b2c7b25f11d4c32cd",
-"canvaskit/canvaskit.wasm": "4b83d89d9fecbea8ca46f2f760c5a9ba"
+"canvaskit/canvaskit.js": "2bc454a691c631b07a9307ac4ca47797",
+"canvaskit/profiling/canvaskit.js": "38164e5a72bdad0faa4ce740c9b8e564",
+"canvaskit/profiling/canvaskit.wasm": "95a45378b69e77af5ed2bc72b2209b94",
+"canvaskit/canvaskit.wasm": "bf50631470eb967688cca13ee181af62"
 };
 
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = [
-  "/",
-"main.dart.js",
+  "main.dart.js",
 "index.html",
-"assets/NOTICES",
 "assets/AssetManifest.json",
 "assets/FontManifest.json"];
 // During install, the TEMP cache is populated with the application shell files.
@@ -151,9 +151,11 @@ self.addEventListener("fetch", (event) => {
     .then((cache) =>  {
       return cache.match(event.request).then((response) => {
         // Either respond with the cached resource, or perform a fetch and
-        // lazily populate the cache.
+        // lazily populate the cache only if the resource was successfully fetched.
         return response || fetch(event.request).then((response) => {
-          cache.put(event.request, response.clone());
+          if (response && Boolean(response.ok)) {
+            cache.put(event.request, response.clone());
+          }
           return response;
         });
       })
